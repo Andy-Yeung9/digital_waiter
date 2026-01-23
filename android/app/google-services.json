@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "318263045768",
+    "project_id": "digital-waiter-5dbd1",
+    "storage_bucket": "digital-waiter-5dbd1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:318263045768:android:f75851f2f70dd798ac793d",
+        "android_client_info": {
+          "package_name": "com.example.digital_waiter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8hN_NKHp67XY1uhGFHYlq75iDgHTxdbU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
