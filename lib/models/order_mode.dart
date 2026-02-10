@@ -1,0 +1,1 @@
+enum OrderMode { dineIn, takeaway }
