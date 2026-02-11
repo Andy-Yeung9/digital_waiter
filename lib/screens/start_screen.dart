@@ -81,7 +81,7 @@ class _StartScreenState extends State<StartScreen>
                     top: -h * 0.08,
                     width: w * 0.92,
                     child: Image.asset(
-                      'assets/images/steak_start_screen-removebg-preview.png',
+                      'assets/images/Start_screen/steak_start_screen-removebg-preview.png',
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -94,7 +94,7 @@ class _StartScreenState extends State<StartScreen>
                     child: Opacity(
                       opacity: 0.95,
                       child: Image.asset(
-                        'assets/images/salad_start_screen-removebg-preview.png',
+                        'assets/images/Start_screen/salad_start_screen-removebg-preview.png',
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -108,7 +108,7 @@ class _StartScreenState extends State<StartScreen>
                     child: Opacity(
                       opacity: 0.95,
                       child: Image.asset(
-                        'assets/images/dessert_start_screen-removebg-preview.png',
+                        'assets/images/Start_screen/dessert_start_screen-removebg-preview.png',
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -120,7 +120,7 @@ class _StartScreenState extends State<StartScreen>
                     bottom: -h * 0.12,
                     width: w * 0.78, // smaller than before
                     child: Image.asset(
-                      'assets/images/burger_start_screen.png',
+                      'assets/images/Start_screen/burger_start_screen.png',
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -150,7 +150,7 @@ class _StartScreenState extends State<StartScreen>
                           children: [
                             // LOGO above the title
                             Image.asset(
-                              'assets/images/Logo Grill Empire.png',
+                              'assets/images/Start_screen/Logo Grill Empire.png',
                               height: isTablet ? 200 : 150,
                               fit: BoxFit.contain,
                             ),
