@@ -25,11 +25,22 @@ class _MenuScreenState extends State<MenuScreen> {
   String? selectedCategoryId;
   final PageController _bannerController =
       PageController(viewportFraction: 0.9, initialPage: 1);
-  int _bannerIndex = 0;
+  final PageController _steakCardController =
+      PageController(viewportFraction: 0.74, initialPage: 1);
+  final PageController _burgerCardController =
+      PageController(viewportFraction: 0.74, initialPage: 1);
   int _bannerPage = 1;
   final int _bannerCount = 3;
+  int _steakCardPage = 1;
+  final int _steakCardCount = 14;
+  int _burgerCardPage = 1;
+  final int _burgerCardCount = 5;
   int _bottomIndex = 0;
   Timer? _bannerTimer;
+  Timer? _steakCardTimer;
+  Timer? _burgerCardTimer;
+  static const double _bottomBarHeight = 64;
+  static const double _bottomBarBottomPadding = 12;
 
   QueryDocumentSnapshot<Object?>? _matchCategoryByLabel(
     List<QueryDocumentSnapshot<Object?>> categories,
@@ -48,17 +59,52 @@ class _MenuScreenState extends State<MenuScreen> {
     return null;
   }
 
+  String _translationKeyForLocale(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode.toLowerCase();
+    if (localeCode == 'zh') return 'man';
+    if (localeCode == 'en' ||
+        localeCode == 'fr' ||
+        localeCode == 'hi' ||
+        localeCode == 'ur' ||
+        localeCode == 'man') {
+      return localeCode;
+    }
+    return 'en';
+  }
+
+  String _categoryDisplayName(
+    BuildContext context,
+    QueryDocumentSnapshot<Object?>? doc, {
+    required String fallback,
+  }) {
+    if (doc == null) return fallback;
+    final data = doc.data() as Map<String, dynamic>;
+    final names = (data['nameTranslations'] ?? {}) as Map<String, dynamic>;
+    final key = _translationKeyForLocale(context);
+    final localized = (names[key] ?? '').toString().trim();
+    if (localized.isNotEmpty) return localized;
+    final english = (names['en'] ?? '').toString().trim();
+    if (english.isNotEmpty) return english;
+    return fallback;
+  }
+
   @override
   void initState() {
     super.initState();
     selectedCategoryId = 'all';
     _startAutoScroll();
+    _startSteakCardsAutoScroll();
+    _startBurgerCardsAutoScroll();
   }
 
   @override
   void dispose() {
     _bannerTimer?.cancel();
+    _steakCardTimer?.cancel();
+    _burgerCardTimer?.cancel();
     _bannerController.dispose();
+    _steakCardController.dispose();
+    _burgerCardController.dispose();
     super.dispose();
   }
 
@@ -68,6 +114,32 @@ class _MenuScreenState extends State<MenuScreen> {
       if (!mounted || !_bannerController.hasClients) return;
       final next = _bannerPage + 1;
       _bannerController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  void _startBurgerCardsAutoScroll() {
+    _burgerCardTimer?.cancel();
+    _burgerCardTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted || !_burgerCardController.hasClients) return;
+      final next = _burgerCardPage + 1;
+      _burgerCardController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  void _startSteakCardsAutoScroll() {
+    _steakCardTimer?.cancel();
+    _steakCardTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted || !_steakCardController.hasClients) return;
+      final next = _steakCardPage + 1;
+      _steakCardController.animateToPage(
         next,
         duration: const Duration(milliseconds: 450),
         curve: Curves.easeOut,
@@ -243,17 +315,24 @@ class _MenuScreenState extends State<MenuScreen> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, _bottomBarBottomPadding),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
             child: Container(
-              height: 60,
+              height: _bottomBarHeight,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.75),
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 22,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -307,12 +386,26 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      bottomNavigationBar: _bottomBar(),
-      body: SafeArea(
-        child: Column(
-        children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final bannerHeight = (screenWidth * 0.33).clamp(132.0, 170.0);
+        final featureHeight = (screenWidth * 0.72).clamp(260.0, 360.0);
+        final bottomSafe = MediaQuery.of(context).padding.bottom;
+        final bottomInset = _bottomBarHeight +
+            _bottomBarBottomPadding +
+            bottomSafe +
+            24;
+
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: bottomInset),
+                  child: Column(
+                    children: [
           // ---------- Top row: back + actions ----------
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -324,6 +417,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   tooltip: 'Back',
                 ),
                 const Spacer(),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.language),
+                  tooltip: 'Language',
+                ),
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.checklist),
@@ -389,7 +487,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
           // ---------- Banner carousel ----------
           SizedBox(
-            height: 142,
+            height: bannerHeight,
             child: PageView.builder(
               controller: _bannerController,
               clipBehavior: Clip.none,
@@ -398,17 +496,14 @@ class _MenuScreenState extends State<MenuScreen> {
                 if (index == 0) {
                   _bannerPage = _bannerCount;
                   _bannerController.jumpToPage(_bannerCount);
-                  _bannerIndex = _bannerCount - 1;
                   return;
                 }
                 if (index == _bannerCount + 1) {
                   _bannerPage = 1;
                   _bannerController.jumpToPage(1);
-                  _bannerIndex = 0;
                   return;
                 }
                 _bannerPage = index;
-                _bannerIndex = index - 1;
               },
               itemBuilder: (context, index) {
                 int bannerIndex;
@@ -517,12 +612,32 @@ class _MenuScreenState extends State<MenuScreen> {
                 final categories = snapshot.data?.docs ?? [];
 
                 final iconItems = [
-                  {'label': 'All', 'asset': ''},
-                  {'label': 'Steak', 'asset': 'assets/icons/steak.png'},
-                  {'label': 'Burger', 'asset': 'assets/icons/burger.png'},
-                  {'label': 'Fries', 'asset': 'assets/icons/french-fries.png'},
-                  {'label': 'Desserts', 'asset': 'assets/icons/dessert.png'},
-                  {'label': 'Drinks', 'asset': 'assets/icons/soft-drink.png'},
+                  {'query': 'All', 'fallback': 'All', 'asset': ''},
+                  {
+                    'query': 'Steak',
+                    'fallback': 'Steak',
+                    'asset': 'assets/icons/steak.png',
+                  },
+                  {
+                    'query': 'Burgers',
+                    'fallback': 'Burgers',
+                    'asset': 'assets/icons/burger.png',
+                  },
+                  {
+                    'query': 'Fries',
+                    'fallback': 'Fries',
+                    'asset': 'assets/icons/french-fries.png',
+                  },
+                  {
+                    'query': 'Desserts',
+                    'fallback': 'Desserts',
+                    'asset': 'assets/icons/dessert.png',
+                  },
+                  {
+                    'query': 'Drinks',
+                    'fallback': 'Drinks',
+                    'asset': 'assets/icons/soft-drink.png',
+                  },
                 ];
 
                 return ListView.separated(
@@ -532,14 +647,22 @@ class _MenuScreenState extends State<MenuScreen> {
                   separatorBuilder: (_, __) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     final item = iconItems[index];
-                    final label = item['label']!;
+                    final queryLabel = item['query']!;
+                    final fallbackLabel = item['fallback']!;
                     final asset = item['asset']!;
 
-                    final isAll = label == 'All';
+                    final isAll = queryLabel == 'All';
                     final match =
-                        isAll ? null : _matchCategoryByLabel(categories, label);
+                        isAll ? null : _matchCategoryByLabel(categories, queryLabel);
                     final selectedId = isAll ? 'all' : (match?.id ?? '__none__');
                     final isSelected = selectedCategoryId == selectedId;
+                    final displayLabel = isAll
+                        ? fallbackLabel
+                        : _categoryDisplayName(
+                            context,
+                            match,
+                            fallback: fallbackLabel,
+                          );
 
                     return GestureDetector(
                       onTap: () {
@@ -577,7 +700,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              label,
+                              displayLabel,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -602,7 +725,7 @@ class _MenuScreenState extends State<MenuScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
               child: SizedBox(
-                height: 300,
+                height: featureHeight,
                 child: Row(
                   children: [
                     Expanded(
@@ -660,13 +783,511 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
             ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('MenuCategories')
+                .where('isActive', isEqualTo: true)
+                .orderBy('sortOrder')
+                .snapshots(),
+            builder: (context, snapshot) {
+              final categories = snapshot.data?.docs ?? [];
+              final steakDoc = _matchCategoryByLabel(categories, 'Steak');
+              final steakTitle = _categoryDisplayName(
+                context,
+                steakDoc,
+                fallback: 'Steak',
+              );
+
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+                child: Row(
+                  children: [
+                    Text(
+                      steakTitle,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'See More>>',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          SizedBox(
+            height: 242,
+            child: PageView.builder(
+              controller: _steakCardController,
+              clipBehavior: Clip.none,
+              itemCount: _steakCardCount + 2,
+              onPageChanged: (index) {
+                if (index == 0) {
+                  _steakCardPage = _steakCardCount;
+                  _steakCardController.jumpToPage(_steakCardCount);
+                  return;
+                }
+                if (index == _steakCardCount + 1) {
+                  _steakCardPage = 1;
+                  _steakCardController.jumpToPage(1);
+                  return;
+                }
+                _steakCardPage = index;
+              },
+              itemBuilder: (context, index) {
+                int itemIndex;
+                if (index == 0) {
+                  itemIndex = _steakCardCount - 1;
+                } else if (index == _steakCardCount + 1) {
+                  itemIndex = 0;
+                } else {
+                  itemIndex = index - 1;
+                }
+
+                final steakCards = [
+                  {
+                    'title': 'BBQ Chicken Steak',
+                    'description':
+                        'Chargrilled chicken steak,\nsmoky BBQ glaze,\nserved juicy hot.',
+                    'price': 'Rs 540',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FBBQ_chicken-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Chicken Breast Steak',
+                    'description':
+                        'Lean grilled chicken breast,\nlight herb seasoning,\nclean savory finish.',
+                    'price': 'Rs 560',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FChicken_Breast.png?alt=media',
+                  },
+                  {
+                    'title': 'Chicken Steak',
+                    'description':
+                        'Tender chicken steak,\nseared and juicy,\nhouse savory gravy.',
+                    'price': 'Rs 580',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FChicken_Steak.png?alt=media',
+                  },
+                  {
+                    'title': 'Peri Peri Chicken Steak',
+                    'description':
+                        'Spicy peri peri chicken,\nbold grilled heat,\nzesty finish.',
+                    'price': 'Rs 570',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FPeri_Peri.png?alt=media',
+                  },
+                  {
+                    'title': 'Chicken Supreme Steak',
+                    'description':
+                        'Signature chicken steak,\ncreamy mushroom sauce,\nhouse favorite.',
+                    'price': 'Rs 610',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fchicken_supreme-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Chicken Teriyaki Steak',
+                    'description':
+                        'Teriyaki glazed chicken,\nsweet-savory balance,\ngrilled to finish.',
+                    'price': 'Rs 590',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fchicken_teriyaki_steak-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Filet Mignon',
+                    'description':
+                        'Premium tenderloin cut,\nbuttery texture,\npan-seared finish.',
+                    'price': 'Rs 800',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FFillet_Mignon.png?alt=media',
+                  },
+                  {
+                    'title': 'New York Strip Steak',
+                    'description':
+                        'Classic strip cut,\nrich beef flavor,\ncrisp seared edge.',
+                    'price': 'Rs 780',
+                    'imageScale': 1.02,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FNY_strip.png?alt=media',
+                  },
+                  {
+                    'title': 'T-Bone Steak',
+                    'description':
+                        'Bone-in classic cut,\nrich marbling,\ndeep grilled flavor.',
+                    'price': 'Rs 790',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FTbone_steak-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Ribeye Steak',
+                    'description':
+                        'Well-marbled ribeye,\nintense meaty flavor,\nperfectly grilled.',
+                    'price': 'Rs 800',
+                    'imageScale': 1.05,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fribeye_steak-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Sirloin Steak',
+                    'description':
+                        'Balanced sirloin cut,\nmeaty bite,\npepper-herb finish.',
+                    'price': 'Rs 740',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fsirloin_steak-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Shawarma Spiced Steak',
+                    'description':
+                        'Shawarma-spiced steak,\ngrilled and aromatic,\nserved with garlic notes.',
+                    'price': 'Rs 600',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fshawarma_steak-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Salmon Fillet Steak',
+                    'description':
+                        'Pan-seared salmon,\nlemon herb butter,\nflaky and tender.',
+                    'price': 'Rs 760',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FSalmon_fillet.png?alt=media',
+                  },
+                  {
+                    'title': 'Roasted Pork Steak',
+                    'description':
+                        'Slow-roasted pork steak,\npepper glaze,\ncaramelized finish.',
+                    'price': 'Rs 620',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FRoasted_Pork.png?alt=media',
+                  },
+                ];
+
+                final card = steakCards[itemIndex % steakCards.length];
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 26, 20, 14),
+                  child: _showcaseCard(
+                    title: card['title'] as String,
+                    description: card['description'] as String,
+                    price: card['price'] as String,
+                    imageUrl: card['imageUrl'] as String,
+                    imageScale: (card['imageScale'] as num).toDouble(),
+                  ),
+                );
+              },
+            ),
+          ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('MenuCategories')
+                .where('isActive', isEqualTo: true)
+                .orderBy('sortOrder')
+                .snapshots(),
+            builder: (context, snapshot) {
+              final categories = snapshot.data?.docs ?? [];
+              final burgersDoc = _matchCategoryByLabel(categories, 'Burgers');
+              final burgersTitle = _categoryDisplayName(
+                context,
+                burgersDoc,
+                fallback: 'Burgers',
+              );
+
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+                child: Row(
+                  children: [
+                    Text(
+                      burgersTitle,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'See More>>',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          SizedBox(
+            height: 242,
+            child: PageView.builder(
+              controller: _burgerCardController,
+              clipBehavior: Clip.none,
+              itemCount: _burgerCardCount + 2,
+              onPageChanged: (index) {
+                if (index == 0) {
+                  _burgerCardPage = _burgerCardCount;
+                  _burgerCardController.jumpToPage(_burgerCardCount);
+                  return;
+                }
+                if (index == _burgerCardCount + 1) {
+                  _burgerCardPage = 1;
+                  _burgerCardController.jumpToPage(1);
+                  return;
+                }
+                _burgerCardPage = index;
+              },
+              itemBuilder: (context, index) {
+                int itemIndex;
+                if (index == 0) {
+                  itemIndex = _burgerCardCount - 1;
+                } else if (index == _burgerCardCount + 1) {
+                  itemIndex = 0;
+                } else {
+                  itemIndex = index - 1;
+                }
+
+                final burgerCards = [
+                  {
+                    'title': 'Chicken Breast Burger',
+                    'description':
+                        'Fresh grilled chicken,\ncrisp lettuce,\nand house sauce.',
+                    'price': 'Rs 250',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2Fchicken_breast-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Beef Burger',
+                    'description':
+                        'Juicy beef patty,\ncheddar, lettuce,\nand signature sauce.',
+                    'price': 'Rs 350',
+                    'imageScale': 0.88,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2FBeef_Burger.png?alt=media',
+                  },
+                  {
+                    'title': 'Beyond Meat Burger',
+                    'description':
+                        'Plant-based patty,\nfresh veggies,\nand smoky dressing.',
+                    'price': 'Rs 300',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2Fburger_veg-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Teriyaki Chicken',
+                    'description':
+                        'Teriyaki glazed thigh,\ncrunchy slaw,\nand sesame mayo.',
+                    'price': 'Rs 320',
+                    'imageScale': 1.14,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2FChicken_Teriyaki-removebg-preview.png?alt=media',
+                  },
+                  {
+                    'title': 'Catfish Fillet',
+                    'description':
+                        'Crispy fish fillet,\nlettuce, pickles,\nand tartar sauce.',
+                    'price': 'Rs 300',
+                    'imageScale': 1.00,
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2Ffillet_burger-removebg-preview.png?alt=media',
+                  },
+                ];
+
+                final card = burgerCards[itemIndex % burgerCards.length];
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 26, 20, 14),
+                  child: _showcaseCard(
+                    title: card['title'] as String,
+                    description: card['description'] as String,
+                    price: card['price'] as String,
+                    imageUrl: card['imageUrl'] as String,
+                    imageScale: (card['imageScale'] as num).toDouble(),
+                  ),
+                );
+              },
+            ),
+          ),
 
           const Divider(height: 1),
 
           // ---------- Items (hidden for now) ----------
           const SizedBox.shrink(),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        16,
+                        0,
+                        16,
+                        _bottomBarBottomPadding + _bottomBarHeight - 8,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                          child: Container(
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _bottomBar(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _showcaseCard({
+    required String title,
+    required String description,
+    required String price,
+    required String imageUrl,
+    double imageScale = 1.0,
+  }) {
+    return Container(
+      height: 190,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFFFF2D9),
+            Color(0xFFFFE3B3),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            right: -42,
+            top: -44,
+            child: Container(
+              width: 168,
+              height: 168,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Transform.scale(
+                  scale: imageScale,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 18, 106, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            right: 16,
+            bottom: 14,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.88),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                price,
+                style: GoogleFonts.poppins(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
