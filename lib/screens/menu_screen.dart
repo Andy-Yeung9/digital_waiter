@@ -32,7 +32,7 @@ class _MenuScreenState extends State<MenuScreen> {
   int _bannerPage = 1;
   final int _bannerCount = 3;
   int _steakCardPage = 1;
-  final int _steakCardCount = 14;
+  final int _steakCardCount = 12;
   int _burgerCardPage = 1;
   final int _burgerCardCount = 5;
   int _bottomIndex = 0;
@@ -871,25 +871,21 @@ class _MenuScreenState extends State<MenuScreen> {
                         'Lean grilled chicken breast,\nlight herb seasoning,\nclean savory finish.',
                     'price': 'Rs 560',
                     'imageScale': 1.00,
+                    'imageDx': 0.0,
+                    'imageDy': 0.0,
                     'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FChicken_Breast.png?alt=media',
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FSteak_Chicken_Breast-removebg-preview.png?alt=media',
+          
                   },
                   {
-                    'title': 'Chicken Steak',
-                    'description':
-                        'Tender chicken steak,\nseared and juicy,\nhouse savory gravy.',
-                    'price': 'Rs 580',
-                    'imageScale': 1.00,
-                    'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FChicken_Steak.png?alt=media',
-                  },
-                  {
-                    'title': 'Peri Peri Chicken Steak',
+                    'title': 'Peri Peri \nChicken Steak',
                     'description':
                         'Spicy peri peri chicken,\nbold grilled heat,\nzesty finish.',
                     'price': 'Rs 570',
-                    'imageScale': 1.00,
+                    'imageScale': 0.98,
                     'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FPeri_Peri-removebg-preview.png?alt=media',
+                    'imageBackupUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FPeri_Peri.png?alt=media',
                   },
                   {
@@ -902,11 +898,11 @@ class _MenuScreenState extends State<MenuScreen> {
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fchicken_supreme-removebg-preview.png?alt=media',
                   },
                   {
-                    'title': 'Chicken Teriyaki Steak',
+                    'title': 'Teriyaki\nChicken Steak',
                     'description':
                         'Teriyaki glazed chicken,\nsweet-savory balance,\ngrilled to finish.',
                     'price': 'Rs 590',
-                    'imageScale': 1.00,
+                    'imageScale': 0.95,
                     'imageUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fchicken_teriyaki_steak-removebg-preview.png?alt=media',
                   },
@@ -915,8 +911,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     'description':
                         'Premium tenderloin cut,\nbuttery texture,\npan-seared finish.',
                     'price': 'Rs 800',
-                    'imageScale': 1.00,
+                    'imageScale': 1.10,
                     'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FFillet_Mignon-removebg-preview.png?alt=media',
+                    'imageBackupUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FFillet_Mignon.png?alt=media',
                   },
                   {
@@ -924,8 +922,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     'description':
                         'Classic strip cut,\nrich beef flavor,\ncrisp seared edge.',
                     'price': 'Rs 780',
-                    'imageScale': 1.02,
+                    'imageScale': 1.00,
                     'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FNY_strip-removebg-preview.png?alt=media',
+                    'imageBackupUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FNY_strip.png?alt=media',
                   },
                   {
@@ -933,7 +933,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     'description':
                         'Bone-in classic cut,\nrich marbling,\ndeep grilled flavor.',
                     'price': 'Rs 790',
-                    'imageScale': 1.00,
+                    'imageScale': 0.92,
                     'imageUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FTbone_steak-removebg-preview.png?alt=media',
                   },
@@ -960,7 +960,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     'description':
                         'Shawarma-spiced steak,\ngrilled and aromatic,\nserved with garlic notes.',
                     'price': 'Rs 600',
-                    'imageScale': 1.00,
+                    'imageScale': 0.92,
                     'imageUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2Fshawarma_steak-removebg-preview.png?alt=media',
                   },
@@ -969,19 +969,13 @@ class _MenuScreenState extends State<MenuScreen> {
                     'description':
                         'Pan-seared salmon,\nlemon herb butter,\nflaky and tender.',
                     'price': 'Rs 760',
-                    'imageScale': 1.00,
+                    'imageScale': 1.02,
                     'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FSalmon_fillet-removebg-preview.png?alt=media',
+                    'imageBackupUrl':
                         'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FSalmon_fillet.png?alt=media',
                   },
-                  {
-                    'title': 'Roasted Pork Steak',
-                    'description':
-                        'Slow-roasted pork steak,\npepper glaze,\ncaramelized finish.',
-                    'price': 'Rs 620',
-                    'imageScale': 1.00,
-                    'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2FRoasted_Pork.png?alt=media',
-                  },
+                 
                 ];
 
                 final card = steakCards[itemIndex % steakCards.length];
@@ -992,7 +986,15 @@ class _MenuScreenState extends State<MenuScreen> {
                     description: card['description'] as String,
                     price: card['price'] as String,
                     imageUrl: card['imageUrl'] as String,
+                    imageBackupUrl: card['imageBackupUrl'] as String?,
+                    imageBackupUrl2: card['imageBackupUrl2'] as String?,
                     imageScale: (card['imageScale'] as num).toDouble(),
+                    imageDx: (card['imageDx'] as num?)?.toDouble() ?? 0,
+                    imageDy: (card['imageDy'] as num?)?.toDouble() ?? 0,
+                    cardStartColor: const Color(0xFFEAD3B5),
+                    cardEndColor: const Color(0xFFDCE6DA),
+                    titleColor: Colors.black87,
+                    descriptionColor: Colors.black54,
                   ),
                 );
               },
@@ -1127,6 +1129,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     price: card['price'] as String,
                     imageUrl: card['imageUrl'] as String,
                     imageScale: (card['imageScale'] as num).toDouble(),
+                    cardStartColor: const Color(0xFFE9EFE6),
+                    cardEndColor: const Color(0xFFF2C28F),
+                    titleColor: Colors.black87,
+                    descriptionColor: Colors.black54,
                   ),
                 );
               },
@@ -1189,27 +1195,28 @@ class _MenuScreenState extends State<MenuScreen> {
     required String description,
     required String price,
     required String imageUrl,
+    String? imageBackupUrl,
+    String? imageBackupUrl2,
     double imageScale = 1.0,
+    double imageDx = 0,
+    double imageDy = 0,
+    Color cardStartColor = const Color(0xFFFFF2D9),
+    Color cardEndColor = const Color(0xFFFFE3B3),
+    Color titleColor = Colors.black87,
+    Color descriptionColor = Colors.black54,
   }) {
     return Container(
       height: 190,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFFFF2D9),
-            Color(0xFFFFE3B3),
+            cardStartColor,
+            cardEndColor,
           ],
         ),
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -1220,22 +1227,37 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Container(
               width: 168,
               height: 168,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
+              decoration: const BoxDecoration(shape: BoxShape.circle),
               child: ClipOval(
-                child: Transform.scale(
-                  scale: imageScale,
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
+                child: Transform.translate(
+                  offset: Offset(imageDx, imageDy),
+                  child: Transform.scale(
+                    scale: imageScale,
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        if (imageBackupUrl == null || imageBackupUrl.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+                        return Image.network(
+                          imageBackupUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            if (imageBackupUrl2 == null ||
+                                imageBackupUrl2.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return Image.network(
+                              imageBackupUrl2,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const SizedBox.shrink(),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -1251,7 +1273,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                    color: titleColor,
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -1261,7 +1283,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
-                    color: Colors.black54,
+                    color: descriptionColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

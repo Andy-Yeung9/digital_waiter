@@ -20,11 +20,13 @@ class MenuItemsSeeder {
   }
 
   static String _storageDownloadUrl(String fileName) {
-    return 'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2F$fileName?alt=media';
+    final encodedName = Uri.encodeComponent(fileName);
+    return 'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-burgers%2F$encodedName?alt=media';
   }
 
   static String _steakStorageDownloadUrl(String fileName) {
-    return 'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2F$fileName?alt=media';
+    final encodedName = Uri.encodeComponent(fileName);
+    return 'https://firebasestorage.googleapis.com/v0/b/digital-waiter-5dbd1.firebasestorage.app/o/menu_items-steaks%2F$encodedName?alt=media';
   }
 
   static Future<void> _upsertMenuItem({
@@ -52,6 +54,21 @@ class MenuItemsSeeder {
       'createdAt': FieldValue.serverTimestamp(),
     });
     print('MenuItems seed: inserted "$englishName" with id ${doc.id}.');
+  }
+
+  static Future<void> _deleteMenuItemByEnglishName({
+    required String categoryId,
+    required String englishName,
+  }) async {
+    final menuItems = FirebaseFirestore.instance.collection('MenuItems');
+    final existing = await menuItems
+        .where('categoryId', isEqualTo: categoryId)
+        .where('nameTranslations.en', isEqualTo: englishName)
+        .limit(1)
+        .get();
+
+    if (existing.docs.isEmpty) return;
+    await existing.docs.first.reference.delete();
   }
 
   static Future<void> seedChickenBreastBurger() async {
@@ -239,6 +256,15 @@ class MenuItemsSeeder {
   }
 
   static Future<void> seedAllCurrentSteaks() async {
+    await _deleteMenuItemByEnglishName(
+      categoryId: steakCategoryId,
+      englishName: 'Chicken Skewer',
+    );
+    await _deleteMenuItemByEnglishName(
+      categoryId: steakCategoryId,
+      englishName: 'Chicken Steak',
+    );
+
     final items = <Map<String, dynamic>>[
       {
         'englishName': 'BBQ Chicken Steak',
@@ -300,38 +326,9 @@ class MenuItemsSeeder {
           'dietaryLabels': ['HALAL'],
           'availabilityStatus': 'Available',
           'specialFlag': 'None',
-          'imageUrl': _steakStorageDownloadUrl('Chicken_Breast.png'),
-          'isActive': true,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-      },
-      {
-        'englishName': 'Chicken Steak',
-        'data': {
-          'categoryId': steakCategoryId,
-          'nameTranslations': {
-            'en': 'Chicken Steak',
-            'fr': 'Steak de poulet',
-            'hi': 'चिकन स्टेक',
-            'ur': 'چکن اسٹیک',
-            'man': '鸡排',
-          },
-          'descriptionTranslations': {
-            'en':
-                'Tender chicken steak seared and finished with house savory gravy.',
-            'fr':
-                'Steak de poulet tendre, saisi puis nappe de sauce maison savoureuse.',
-            'hi': 'नरम चिकन स्टेक, हाउस सेवरी ग्रेवी के साथ।',
-            'ur': 'نرم چکن اسٹیک، ہاؤس سیوری گریوی کے ساتھ۔',
-            'man': '鲜嫩鸡排，搭配招牌咸香肉汁。',
-          },
-          'prices': _prices(single: 580.0, mealSet: 730.0),
-          'prepTimeMinutes': 16,
-          'allergens': ['DAIRY'],
-          'dietaryLabels': ['HALAL'],
-          'availabilityStatus': 'Available',
-          'specialFlag': 'None',
-          'imageUrl': _steakStorageDownloadUrl('Chicken_Steak.png'),
+          'imageUrl': _steakStorageDownloadUrl(
+            'Steak_Chicken_Breast-removebg-preview.png',
+          ),
           'isActive': true,
           'updatedAt': FieldValue.serverTimestamp(),
         },
@@ -362,7 +359,8 @@ class MenuItemsSeeder {
           'dietaryLabels': ['HALAL'],
           'availabilityStatus': 'Available',
           'specialFlag': 'ChefRecommendation',
-          'imageUrl': _steakStorageDownloadUrl('Fillet_Mignon.png'),
+          'imageUrl':
+              _steakStorageDownloadUrl('Fillet_Mignon-removebg-preview.png'),
           'isActive': true,
           'updatedAt': FieldValue.serverTimestamp(),
         },
@@ -393,7 +391,7 @@ class MenuItemsSeeder {
           'dietaryLabels': ['HALAL'],
           'availabilityStatus': 'Available',
           'specialFlag': 'None',
-          'imageUrl': _steakStorageDownloadUrl('NY_strip.png'),
+          'imageUrl': _steakStorageDownloadUrl('NY_strip-removebg-preview.png'),
           'isActive': true,
           'updatedAt': FieldValue.serverTimestamp(),
         },
@@ -424,38 +422,8 @@ class MenuItemsSeeder {
           'dietaryLabels': ['HALAL'],
           'availabilityStatus': 'Available',
           'specialFlag': 'None',
-          'imageUrl': _steakStorageDownloadUrl('Peri_Peri.png'),
-          'isActive': true,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-      },
-      {
-        'englishName': 'Roasted Pork Steak',
-        'data': {
-          'categoryId': steakCategoryId,
-          'nameTranslations': {
-            'en': 'Roasted Pork Steak',
-            'fr': 'Steak de porc roti',
-            'hi': 'रोस्टेड पोर्क स्टेक',
-            'ur': 'روسٹڈ پورک اسٹیک',
-            'man': '烤猪排',
-          },
-          'descriptionTranslations': {
-            'en':
-                'Slow-roasted pork steak with pepper glaze and caramelized finish.',
-            'fr':
-                'Steak de porc roti lentement, glace au poivre et finition caramélisee.',
-            'hi': 'धीमी आँच पर रोस्टेड पोर्क स्टेक, पेपर ग्लेज़ के साथ।',
-            'ur': 'سلو روسٹڈ پورک اسٹیک، پیپر گلیز کے ساتھ۔',
-            'man': '慢烤猪排，黑椒酱汁，表面微焦。',
-          },
-          'prices': _prices(single: 620.0, mealSet: 770.0),
-          'prepTimeMinutes': 20,
-          'allergens': ['SOY'],
-          'dietaryLabels': [],
-          'availabilityStatus': 'Available',
-          'specialFlag': 'None',
-          'imageUrl': _steakStorageDownloadUrl('Roasted_Pork.png'),
+          'imageUrl':
+              _steakStorageDownloadUrl('Peri_Peri-removebg-preview.png'),
           'isActive': true,
           'updatedAt': FieldValue.serverTimestamp(),
         },
@@ -486,7 +454,8 @@ class MenuItemsSeeder {
           'dietaryLabels': ['PESCATARIAN'],
           'availabilityStatus': 'Available',
           'specialFlag': 'ChefRecommendation',
-          'imageUrl': _steakStorageDownloadUrl('Salmon_fillet.png'),
+          'imageUrl':
+              _steakStorageDownloadUrl('Salmon_fillet-removebg-preview.png'),
           'isActive': true,
           'updatedAt': FieldValue.serverTimestamp(),
         },
@@ -696,3 +665,5 @@ class MenuItemsSeeder {
     }
   }
 }
+
+
